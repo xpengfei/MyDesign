@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,7 +14,6 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -38,11 +36,9 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -65,8 +61,6 @@ import com.example.xpengfei.mybluetoothtest41.utils.MediaPlayerHelper;
 import com.example.xpengfei.mybluetoothtest41.utils.Utils;
 import com.example.xpengfei.mybluetoothtest41.view.ChatListViewAdapter;
 import com.example.xpengfei.mybluetoothtest41.view.DrawerHScrollView;
-
-import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
 import static com.example.xpengfei.mybluetoothtest41.database.SQLHelper.COLUMN_CONTENT;
 import static com.example.xpengfei.mybluetoothtest41.database.SQLHelper.COLUMN_Date;
@@ -181,7 +175,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 		}
 		//---------------------------------------------------------------------
 	}
-	//搜索、指令、关于等按钮的点击监听事件
+	//搜索、指令、配网、删除、关于等按钮的点击监听事件
 	private void initListener(){
 		Button btnSearch = (Button) findViewById(R.id.btnSelect);
 		btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -214,6 +208,43 @@ public class MainActivity extends Activity implements View.OnClickListener{
 					Toast.makeText(MainActivity.this,"聊天记录已删除！",Toast.LENGTH_SHORT).show();
 				}else
 					Toast.makeText(MainActivity.this,"尚未建立通信连接！",Toast.LENGTH_SHORT).show();
+			}
+		});
+		Button confWifi= findViewById(R.id.configWifi);
+		confWifi.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				// 创建对话框构建器
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				// 获取布局
+				View view2 = View.inflate(MainActivity.this, R.layout.config_wifi, null);
+				// 获取布局中的控件
+				final EditText username = (EditText) view2.findViewById(R.id.username);
+				final EditText password = (EditText) view2.findViewById(R.id.password);
+				final Button button = (Button) view2.findViewById(R.id.btn_login);
+				final Button cancelBtn = view2.findViewById(R.id.btn_cancellogin);
+				builder.setTitle("配网").setIcon(R.drawable.ic_launcher)
+						.setView(view2);
+				final AlertDialog alertDialog = builder.create();
+				button.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						String uname = username.getText().toString().trim();
+						String psd = password.getText().toString().trim();
+						if (uname.equals("zcl") && psd.equals("123456")) {
+							Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+						}
+						Toast.makeText(MainActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+						alertDialog.dismiss();// 对话框消失
+					}
+				});
+				cancelBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						alertDialog.dismiss();// 对话框消失
+					}
+				});
+				alertDialog.show();
 			}
 		});
 	}
@@ -901,10 +932,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 				mWifiInfo = mWifiManager.getConnectionInfo();
 				reWifiInfo = "SSID:"+mWifiInfo.getSSID() + "\t MAC:" + mWifiInfo.getMacAddress();
 				break;
-			case "配网":
-
-
-				break;
 			case "获取当前网络状态":
 				//获取网络连接服务
 				connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -1074,7 +1101,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 		}
 		closeWifiResult = "WIFI已关闭...";
 	}
-
 
 	//获取电池信息的广播接收器
 	public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

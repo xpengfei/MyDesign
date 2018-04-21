@@ -22,6 +22,12 @@
             android:text="指令"
             android:layout_weight="1"/>
         <Button
+            android:id="@+id/configWifi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="配网"
+            android:layout_weight="1"/>
+        <Button
             android:id="@+id/deleteBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

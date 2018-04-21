@@ -17,7 +17,6 @@
         <item>打开WiFi</item>
         <item>关闭WiFi</item>
         <item>当前WiFi信息</item>
-        <item>配网</item>
         <item>获取当前网络状态</item>
     </array>
 </resources>
