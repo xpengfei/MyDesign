@@ -59,6 +59,7 @@ import com.example.xpengfei.mybluetoothtest41.task.Task;
 import com.example.xpengfei.mybluetoothtest41.task.TaskService;
 import com.example.xpengfei.mybluetoothtest41.utils.MediaPlayerHelper;
 import com.example.xpengfei.mybluetoothtest41.utils.Utils;
+import com.example.xpengfei.mybluetoothtest41.utils.WifiAutoConnectManager;
 import com.example.xpengfei.mybluetoothtest41.view.ChatListViewAdapter;
 import com.example.xpengfei.mybluetoothtest41.view.DrawerHScrollView;
 
@@ -113,6 +114,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 	private String reNetInfo = null;						//要返回的当前网络状态
 	private WifiManager mWifiManager;                // 定义WifiManager（WiFi管理类）对象
 	private WifiInfo mWifiInfo;                      //  当前连接的WiFi对象
+	WifiAutoConnectManager wifiAutoConnectManager;
 	private String reWifiInfo = null;
 	private String closeWifiResult = null;
 	private String openWifiResult =null;
@@ -163,6 +165,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 		mEmoButton.setOnClickListener(this);
 		// 取得WifiManager对象
 		mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		wifiAutoConnectManager = new WifiAutoConnectManager(mWifiManager);
 		//---------------------------------------------------------------------
 		// 打开蓝牙设备
 		if (!mBluetoothAdapter.isEnabled()) {
@@ -231,10 +234,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
 					public void onClick(View v) {
 						String uname = username.getText().toString().trim();
 						String psd = password.getText().toString().trim();
-						if (uname.equals("zcl") && psd.equals("123456")) {
-							Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+						try{
+							wifiAutoConnectManager.connect(uname,psd,psd.equals("")? WifiAutoConnectManager.WifiCipherType.WIFICIPHER_NOPASS: WifiAutoConnectManager.WifiCipherType.WIFICIPHER_WPA);
+						}catch (Exception e){
+							Log.d("配网状态","-----------------异常");
 						}
-						Toast.makeText(MainActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
 						alertDialog.dismiss();// 对话框消失
 					}
 				});
@@ -875,6 +879,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 	//发送指令
 	private void sendOrder(){
+
 		AlertDialog.Builder dlg = new AlertDialog.Builder(this);
 		dlg.setTitle("请选择指令");
 		dlg.setItems(R.array.choiceOrder,new DialogInterface.OnClickListener(){
