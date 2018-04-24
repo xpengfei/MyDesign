@@ -83,8 +83,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static int sBTState = -1;        //蓝牙状态变化
     private final int REQUES_BT_ENABLE_CODE = 123;        //打开蓝牙的请求码
     private final int REQUES_SELECT_BT_CODE = 222;        //选择蓝牙的请求码
-    private String remoteDeviceName;            //所连接的设备的名称
-    private String myDeviceName;                //本机设备蓝牙名称
+    private String remoteDeviceName = null;            //所连接的设备的名称
+    private String myDeviceName = null;                //本机设备蓝牙名称
     private ListView mList;            //聊天内容显示List
     private EditText mInput;        //文本输入框
     private Button mSendBtn;        //发送按钮
@@ -580,6 +580,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
         TaskService.stop(this);
+        connectedDevice.clear();        //清空列表
     }
 
 
@@ -715,15 +716,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     if (msg.obj == null)
                         return;
                     if (msg.obj instanceof HashMap<?, ?>) {
-//                        if (!connectedDevice.contains(remoteDeviceName))
-//                            flag=0;
+                        Log.d("判断前reConnect：",""+TaskService.reConnect);
+                        if (!connectedDevice.contains(remoteDeviceName)  && remoteDeviceName != null && TaskService.reConnect ){
+                            flag=0;
+                            TaskService.reConnect = false ;         //表明已经新设备建立好了连接，再次置为FALSE进行监听
+                        }else if (connectedDevice.contains(remoteDeviceName)){
+                            TaskService.reConnect = false ;         //表明已经与历史设备建立好了连接，再次置为FALSE进行监听
+                        }
+                        Log.d("判断后reConnect：",""+TaskService.reConnect);
                         if (flag == 0) {            //先收到一条上线信息提醒,获取远程设备的名称
                             showTargetMessage((HashMap<String, Object>) msg.obj);
                             isHistory = true;        //开始显示历史数据
                         }
                         flag++;
                         if (flag == 1) {        //接收到上线信息提醒,此时已经获取到远程设备的名称
-                            connectedDevice.add(remoteDeviceName);          //将设备名称添加到List中
+                            if (remoteDeviceName != null){
+                                connectedDevice.add(remoteDeviceName);          //将设备名称添加到List中
+                            }
                             Log.d("flag", String.valueOf(flag));
                             if (chatMapList.size() <= 0) {    //此时还没有读取数据库
                                 readData();
@@ -783,8 +792,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void showTargetMessage(HashMap<String, Object> data) {
         Log.d("测试TTTTT", "收到对方的信息" + ((String) data.get(ChatListViewAdapter.KEY_TEXT)));
         String reMsg = (String) data.get(ChatListViewAdapter.KEY_TEXT);
-        if (reMsg != null)
-            Log.d("对方消息---------------",reMsg);
+//        if (reMsg == null)
+//            return;
+//            Log.d("对方消息---------------",reMsg);
         if ( reMsg != null && reMsg.startsWith(conFWifi)) {
             //收到的是配置网络的指令信息
             String[] wifiInfo = ((String) data.get(ChatListViewAdapter.KEY_TEXT)).split("_");
@@ -809,11 +819,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         if (orderMsgList.contains((String) data.get(ChatListViewAdapter.KEY_TEXT))) {
             doOrderByMsg((String) data.get(ChatListViewAdapter.KEY_TEXT));
-            Log.d("电池信息------------", batteryInfo + "--------");
             if (batteryInfo != null) {        //如果指令是获取电池信息能操作,则将数据发回给对方
                 TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{batteryInfo}));
                 batteryInfo = null;        //数据发送之后,仍置为null
             }
+            Log.d("电池信息------------", batteryInfo + "--------");
             if (reNetInfo != null) {                //将网络状态返回
                 TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{reNetInfo}));
                 reNetInfo = null;        //数据发送之后,仍置为null
@@ -856,7 +866,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 saveData(data);
         }
         Log.d("测试接收数据是否有设备名称??", String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)));
-        remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
+        if (remoteDeviceName == null && String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null){ //用于获取再次连接时对方设备的名称
+            remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
+        }
         if (myDeviceName == null) {
             myDeviceName = mBluetoothAdapter.getName();
         }
@@ -886,7 +898,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         SimpleDateFormat df2 = new SimpleDateFormat("E MM月dd日 yy HH:mm ");
         map.put(ChatListViewAdapter.KEY_DATE, df2.format(System.currentTimeMillis()).toString());
         map.put(ChatListViewAdapter.KEY_SHOW_MSG, "true");
-        myDeviceName = mBluetoothAdapter.getName();
+        if (myDeviceName == null){
+            myDeviceName = mBluetoothAdapter.getName();
+        }
         Log.d("isOnlineTTTTest", String.valueOf(new TaskService().getIsOnline()));
         Log.d("对方设备名称", remoteDeviceName);
         //如果isOnline值为false则说明已经断开连接,,消息发送失败,前端页面不显示
@@ -985,7 +999,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case "当前WiFi信息":
                 // 取得WifiInfo对象
                 mWifiInfo = mWifiManager.getConnectionInfo();
-                reWifiInfo = "SSID:" + mWifiInfo.getSSID() + "\t MAC:" + mWifiInfo.getMacAddress();
+                reWifiInfo = "SSID：" + mWifiInfo.getSSID() + "\t MAC：" + mWifiInfo.getMacAddress()+
+                        "\tRSSI："+mWifiInfo.getRssi()+"\t连接速度："+mWifiInfo.getLinkSpeed();
                 break;
             case "获取当前网络状态":
                 //获取网络连接服务

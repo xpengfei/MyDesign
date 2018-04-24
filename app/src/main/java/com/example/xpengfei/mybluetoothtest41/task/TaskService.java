@@ -38,6 +38,7 @@ public class TaskService extends Service {
     public static final int BT_STAT_ONLINE = 2;        //在线
     public static final int BT_STAT_UNKNOWN = 3;    //未知
     public static boolean isOnline = false;        //标注连接
+    public static boolean reConnect = false ;      //标注是否重新建立了连接
     private final String TAG = "TaskService";
     private TaskThread mThread;                //任务线程
     private List<String> orderMsgList;
@@ -347,6 +348,7 @@ public class TaskService extends Service {
                 mAcceptThread.start();
                 isServerMode = true;
                 isOnline = false;
+                reConnect = true ;
                 return;
             }
             //连接成功后管理连接socket
@@ -361,7 +363,6 @@ public class TaskService extends Service {
             mConnectThread = null;
         }
     }
-
     private ConnectedThread mCommThread;
 
     //管理连接的socket
@@ -483,6 +484,7 @@ public class TaskService extends Service {
                         mAcceptThread = new AcceptThread();
                         mAcceptThread.start();
                         isOnline = false;       //表示当前连接断开
+                        reConnect = true ;
                         Log.d("isOnline？", String.valueOf(isOnline));
                     }
                     break;

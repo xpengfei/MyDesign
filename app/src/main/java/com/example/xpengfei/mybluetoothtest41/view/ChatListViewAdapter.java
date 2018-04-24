@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.text.BoringLayout;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.Spanned;
@@ -143,7 +144,16 @@ public class ChatListViewAdapter extends BaseAdapter {
 			ClickListener listener = (ClickListener) text.getTag();
 			if(listener != null){
 				//隐藏消息内容  &  显示消息内容
-				String isShowMsg = (String)mDatalist.get(position).get(KEY_SHOW_MSG);
+				String isShowMsg = null;
+				try{
+					isShowMsg = (String) mDatalist.get(position).get(KEY_SHOW_MSG);
+				}catch (ClassCastException e){
+					if ((Boolean) mDatalist.get(position).get(KEY_SHOW_MSG)){
+						isShowMsg = "true";
+					}else {
+						isShowMsg = "false";
+					}
+				}
 				if (isShowMsg == null)
 					isShowMsg = (String)mDatalist.get(position).get(COLUMN_SHOW);
 				if(isShowMsg.equals("true")){
@@ -238,8 +248,20 @@ public class ChatListViewAdapter extends BaseAdapter {
 			RelativeLayout rLayout = (RelativeLayout) mView.getParent();
 			ViewHolder holder = (ViewHolder) rLayout.getTag();
 			int pos = holder.getPosition();
-			boolean isShow = (Boolean) mDatalist.get(pos).get(KEY_SHOW_MSG);
-			if(isShow){
+			Log.d("key值------------",KEY_SHOW_MSG);
+			String isShowMsg = null;
+			try {
+				 isShowMsg= (String)mDatalist.get(pos).get(KEY_SHOW_MSG);
+			}catch (ClassCastException e){
+				if ((Boolean) mDatalist.get(pos).get(KEY_SHOW_MSG)){
+					isShowMsg = "true";
+				}else if (!((Boolean) mDatalist.get(pos).get(KEY_SHOW_MSG))){
+					isShowMsg = "false";
+				}
+			}
+			if (isShowMsg == null)
+				isShowMsg = (String)mDatalist.get(pos).get(COLUMN_SHOW);
+			if(isShowMsg.equals("true")){
 				mView.setTransformationMethod(PasswordTransformationMethod.getInstance());
 				try {
 					mDatalist.get(pos).put(KEY_SHOW_MSG, false);
