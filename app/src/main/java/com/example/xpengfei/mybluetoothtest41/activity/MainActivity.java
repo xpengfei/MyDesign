@@ -857,6 +857,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         mChatContent2.add(data);
         mAdapter2.notifyDataSetChanged();
+        Log.d("测试接收数据是否有设备名称??", String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)));
+        if (remoteDeviceName == null && String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null){ //用于获取再次连接时对方设备的名称
+            remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
+        }else if (String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null &&
+                !connectedDevice.contains(String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)))){
+                remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
+        }
+        if (myDeviceName == null) {
+            myDeviceName = mBluetoothAdapter.getName();
+        }
         //收到消息的提示音
         if (!isHistory) {
             SoundEffect.getInstance(MainActivity.this).play(SoundEffect.SOUND_RECV);
@@ -864,13 +874,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             //以保证不将读取出来的聊天记录重复的存储到数据库中chatMapList.size() <= 0 &&
             if (data.get(ChatListViewAdapter.KEY_TEXT) != null && !((String) data.get(ChatListViewAdapter.KEY_TEXT)).equals(remoteDeviceName + "已经上线"))
                 saveData(data);
-        }
-        Log.d("测试接收数据是否有设备名称??", String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)));
-        if (remoteDeviceName == null && String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null){ //用于获取再次连接时对方设备的名称
-            remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
-        }
-        if (myDeviceName == null) {
-            myDeviceName = mBluetoothAdapter.getName();
         }
     }
 
@@ -1076,8 +1079,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //获取一个用于操作数据库的SQLiteDatabase实例...如果磁盘满了,则只能读不能写
         SQLiteDatabase db = sqlHelper.getWritableDatabase();
 //		如果是第一条上线信息的提醒，则不进行保存。
-        if (((String) map.get(ChatListViewAdapter.KEY_TEXT)).equals(myDeviceName + "已经上线") || ((String) map.get(ChatListViewAdapter.KEY_TEXT)).equals(remoteDeviceName + "已经上线"))
+        Log.d("remoteDeviceName--",(String) map.get(ChatListViewAdapter.KEY_TEXT));
+        Log.d("IFmyDeviceName--",((String) map.get(ChatListViewAdapter.KEY_TEXT)).startsWith(new String(myDeviceName + "已经上线"))+"");
+        Log.d("IFremoteDeviceName--",((String) map.get(ChatListViewAdapter.KEY_TEXT)).startsWith(new String(remoteDeviceName + "已经上线"))+"");
+        Log.d("EQUALSmyDeviceName--",myDeviceName + "已经上线");
+        Log.d("EQUALSIFremoteDevice",remoteDeviceName + "已经上线");
+
+
+        if (((String) map.get(ChatListViewAdapter.KEY_TEXT)).startsWith(new String(myDeviceName + "已经上线")) ||
+                ((String) map.get(ChatListViewAdapter.KEY_TEXT)).startsWith(new String(remoteDeviceName + "已经上线"))){
+            Log.d("---IFmyDeviceName--",((String) map.get(ChatListViewAdapter.KEY_TEXT)).equals(myDeviceName + "已经上线")+"");
+            Log.d("---IFremoteDeviceName--",((String) map.get(ChatListViewAdapter.KEY_TEXT)).equals(remoteDeviceName + "已经上线")+"");
             return;
+        }
         //将map对象中的数据保存到数据库中
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_ID, myDeviceName + remoteDeviceName);

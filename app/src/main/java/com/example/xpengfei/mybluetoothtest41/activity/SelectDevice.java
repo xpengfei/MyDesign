@@ -104,7 +104,7 @@ public class SelectDevice extends Activity implements OnClickListener, OnItemCli
 					return;
 				}
 				// 将设备的名称以及地址添加到数组适配器中
-				mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+				mArrayAdapter.add(device.getName() +"      \t"+intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI)+ "\n" + device.getAddress());
 				System.out.println(device.getName() + "\n" + device.getAddress());
 				mDeviceList.add(device);
 				adapter.notifyDataSetChanged();
