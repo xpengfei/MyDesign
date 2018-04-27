@@ -5,18 +5,18 @@
     android:gravity="center_horizontal"
     android:orientation="vertical" >
     <!--关于页面-->
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:src="@drawable/icon"/>
+    <!--<ImageView-->
+        <!--android:id="@+id/imageView1"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="60dp"-->
+        <!--android:src="@drawable/my"/>-->
     
     <TextView 
         android:id="@+id/versionTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="80dp"
         android:text="当前版本 V1.0"
         />
      
@@ -37,12 +37,5 @@
         android:autoLink="web"
         android:text="@string/APP_Introduce"
         />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:autoLink="web"
-        android:text="@string/apk_download"
-        />
+
 </LinearLayout>

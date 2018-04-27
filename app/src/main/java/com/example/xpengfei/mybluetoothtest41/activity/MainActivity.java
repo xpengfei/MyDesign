@@ -857,16 +857,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         mChatContent2.add(data);
         mAdapter2.notifyDataSetChanged();
-        Log.d("测试接收数据是否有设备名称??", String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)));
-        if (remoteDeviceName == null && String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null){ //用于获取再次连接时对方设备的名称
-            remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
-        }else if (String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null &&
-                !connectedDevice.contains(String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)))){
-                remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
-        }
-        if (myDeviceName == null) {
-            myDeviceName = mBluetoothAdapter.getName();
-        }
         //收到消息的提示音
         if (!isHistory) {
             SoundEffect.getInstance(MainActivity.this).play(SoundEffect.SOUND_RECV);
@@ -874,6 +864,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
             //以保证不将读取出来的聊天记录重复的存储到数据库中chatMapList.size() <= 0 &&
             if (data.get(ChatListViewAdapter.KEY_TEXT) != null && !((String) data.get(ChatListViewAdapter.KEY_TEXT)).equals(remoteDeviceName + "已经上线"))
                 saveData(data);
+            if (remoteDeviceName!= null)
+            Log.d("remoteDeviceName******",remoteDeviceName);
+            Log.d("测试接收数据是否有设备名称??", String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)));
+            if (remoteDeviceName == null && String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null){ //用于获取再次连接时对方设备的名称
+                remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
+            }else if (String.valueOf(data.get(ChatListViewAdapter.KEY_NAME))!= null &&
+                    !connectedDevice.contains(String.valueOf(data.get(ChatListViewAdapter.KEY_NAME)))){
+                remoteDeviceName = String.valueOf(data.get(ChatListViewAdapter.KEY_NAME));
+            }
+            if (myDeviceName == null) {
+                myDeviceName = mBluetoothAdapter.getName();
+            }
         }
     }
 
@@ -1150,6 +1152,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         db.delete(TABLE_NAME, COLUMN_ID + " = ? ", new String[]{nameId});
         Log.d("表名", TABLE_NAME);
         Log.d("COLUMN_ID", myDeviceName + remoteDeviceName);
+        Log.d("myDeviceName", myDeviceName);
+        Log.d("remoteDeviceName", remoteDeviceName);
         db.close();
     }
 
