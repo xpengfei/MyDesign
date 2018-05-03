@@ -792,9 +792,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void showTargetMessage(HashMap<String, Object> data) {
         Log.d("测试TTTTT", "收到对方的信息" + ((String) data.get(ChatListViewAdapter.KEY_TEXT)));
         String reMsg = (String) data.get(ChatListViewAdapter.KEY_TEXT);
-//        if (reMsg == null)
-//            return;
-//            Log.d("对方消息---------------",reMsg);
+
         if ( reMsg != null && reMsg.startsWith(conFWifi)) {
             //收到的是配置网络的指令信息
             String[] wifiInfo = ((String) data.get(ChatListViewAdapter.KEY_TEXT)).split("_");
@@ -809,7 +807,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
             try {
                 wifiAutoConnectManager.connect(userName, password, password.equals("") ? WifiAutoConnectManager.WifiCipherType.WIFICIPHER_NOPASS : WifiAutoConnectManager.WifiCipherType.WIFICIPHER_WPA);
-                TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{"网络连接成功！"}));
+                Thread.sleep(3000);
+//                 取得WifiInfo对象
+                mWifiInfo = mWifiManager.getConnectionInfo();
+                Log.d("WiFi名称：",mWifiInfo.getSSID());
+                Log.d("配置的WiFi名称：",userName);
+                Log.d("是否相等",(mWifiInfo.getSSID().trim()).equals(new String("\""+userName+"\""))+"");
+                if ((mWifiInfo.getSSID().trim()).equals(new String("\""+userName+"\""))){
+                    TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{"网络连接成功！"}));
+                }else {
+                    TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{"网络配置异常！"}));
+                }
             } catch (Exception e) {
                 TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{"网络配置异常！"}));
                 Log.d("配网状态", "-----------------异常");

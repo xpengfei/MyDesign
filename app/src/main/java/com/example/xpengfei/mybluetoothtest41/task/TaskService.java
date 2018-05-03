@@ -383,6 +383,7 @@ public class TaskService extends Service {
         public ConnectedThread(BluetoothSocket socket) {
             Log.d(TAG, "ConnectedThread");
             mmSocket = socket;
+
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
             try {
