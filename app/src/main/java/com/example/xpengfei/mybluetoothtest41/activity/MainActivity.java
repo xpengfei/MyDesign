@@ -827,10 +827,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         if (orderMsgList.contains((String) data.get(ChatListViewAdapter.KEY_TEXT))) {
             doOrderByMsg((String) data.get(ChatListViewAdapter.KEY_TEXT));
-            if (batteryInfo != null) {        //如果指令是获取电池信息能操作,则将数据发回给对方
-                TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{batteryInfo}));
-                batteryInfo = null;        //数据发送之后,仍置为null
-            }
+//            if (batteryInfo != null) {        //如果指令是获取电池信息能操作,则将数据发回给对方
+//                TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{batteryInfo}));
+//                batteryInfo = null;        //数据发送之后,仍置为null
+//            }
             Log.d("电池信息------------", batteryInfo + "--------");
             if (reNetInfo != null) {                //将网络状态返回
                 TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{reNetInfo}));
@@ -1002,6 +1002,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 IntentFilter filter = new IntentFilter();
                 filter.addAction(Intent.ACTION_BATTERY_CHANGED);
                 registerReceiver(broadcastReceiver, filter);
+                if (batteryInfo != null) {        //如果指令是获取电池信息能操作,则将数据发回给对方
+                    TaskService.newTask(new Task(mHandler, Task.TASK_SEND_MSG, new Object[]{batteryInfo}));
+                    batteryInfo = null;        //数据发送之后,仍置为null
+                }
                 break;
             case "打开WiFi":
                 openWifi(MainActivity.this);

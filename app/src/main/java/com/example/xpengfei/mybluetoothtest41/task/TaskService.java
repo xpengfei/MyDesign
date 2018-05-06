@@ -308,7 +308,7 @@ public class TaskService extends Service {
             if (mAcceptThread != null && mAcceptThread.isAlive()) {
                 mAcceptThread.cancel();
             }
-            //-------------这里应该改为保持当前连接
+            //-------------取消当前连接
             if (mCommThread != null && mCommThread.isAlive()) {
                 mCommThread.cancel();
             }
